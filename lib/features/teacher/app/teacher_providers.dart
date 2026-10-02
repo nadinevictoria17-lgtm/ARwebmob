@@ -11,6 +11,7 @@ import '../access_codes/access_codes_providers.dart';
 import '../lessons/lessons_providers.dart';
 import '../quizzes/item_analysis_providers.dart';
 import '../quizzes/quizzes_providers.dart';
+import '../reports/reports_providers.dart';
 import '../students/students_providers.dart';
 
 /// Bundles every core/ service a teacher screen needs.
@@ -73,6 +74,14 @@ List<Override> teacherProviderOverridesFor({
         lessonRepository: services.lessonRepository,
       ),
     ),
+    reportsViewModelProvider.overrideWith((ref) {
+      final selectedLessonId = ref.watch(reportsSelectedLessonProvider);
+      return buildReportsViewModel(
+        lessonRepository: services.lessonRepository,
+        studentRepository: services.studentRepository,
+        selectedLessonId: selectedLessonId,
+      );
+    }),
   ];
 }
 

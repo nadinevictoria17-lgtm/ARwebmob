@@ -37,6 +37,7 @@ class TeacherShell extends ConsumerWidget {
     'Lessons',
     'Quizzes',
     'Students',
+    'Reports',
     'Access Codes',
     'Teacher Access',
   ];
@@ -46,6 +47,7 @@ class TeacherShell extends ConsumerWidget {
     LucideIcons.bookOpen,
     LucideIcons.clipboardList,
     LucideIcons.users,
+    LucideIcons.lineChart,
     LucideIcons.keyRound,
     LucideIcons.shieldCheck,
   ];

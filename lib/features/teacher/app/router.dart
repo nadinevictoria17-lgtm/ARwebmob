@@ -7,6 +7,7 @@ import '../dashboard/dashboard_screen.dart';
 import '../lessons/lessons_screen.dart';
 import '../quizzes/item_analysis_screen.dart';
 import '../quizzes/quizzes_screen.dart';
+import '../reports/reports_screen.dart';
 import '../students/students_screen.dart';
 import 'teacher_providers.dart';
 import 'teacher_shell.dart';
@@ -16,6 +17,7 @@ const _routes = [
   '/teacher/lessons',
   '/teacher/quizzes',
   '/teacher/students',
+  '/teacher/reports',
   '/teacher/access-codes',
   '/teacher/teacher-access',
 ];
@@ -55,6 +57,10 @@ GoRouter buildTeacherRouter({required TeacherServices services}) {
           GoRoute(
             path: '/teacher/students',
             builder: (context, state) => const StudentsScreen(),
+          ),
+          GoRoute(
+            path: '/teacher/reports',
+            builder: (context, state) => const ReportsScreen(),
           ),
           GoRoute(
             path: '/teacher/access-codes',
