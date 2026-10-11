@@ -6,7 +6,6 @@ import 'package:flutter_embed_unity/flutter_embed_unity.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-import '../../../core/ar/marker_mapping.dart';
 import '../../../core/ar/voice_scripts_data.dart';
 import '../../../core/models/lesson.dart';
 import '../../../core/services/voice_over_controller.dart';
@@ -269,17 +268,9 @@ class _ScanTabState extends State<ScanTab> with WidgetsBindingObserver {
         Positioned.fill(
           child: EmbedUnity(onMessageFromUnity: _handleUnityMessage),
         ),
-        if (widget.vm.detectedLesson == null)
-          Positioned(
-            top: 16,
-            left: 16,
-            right: 16,
-            child: _InstructionOverlay(
-              text: 'Point your camera at the printed marker for this lesson.',
-              markerImage: widget.vm.markerImage,
-            ),
-          )
-        else
+        // No "point your camera at the marker" card while idle: the Unity
+        // camera feed is the instruction, and the card sat on top of it.
+        if (widget.vm.detectedLesson != null)
           Positioned(
             left: 16,
             right: 16,
@@ -308,67 +299,6 @@ class _ScanTabState extends State<ScanTab> with WidgetsBindingObserver {
             ),
           ),
       ],
-    );
-  }
-}
-
-class _InstructionOverlay extends StatelessWidget {
-  const _InstructionOverlay({required this.text, this.markerImage});
-
-  final String text;
-
-  /// Reference/printable marker image for this lesson, if the teacher
-  /// uploaded one — shown above [text] so the student can see exactly what
-  /// to point their camera at before anything has been recognized yet.
-  final String? markerImage;
-
-  @override
-  Widget build(BuildContext context) {
-    return ShadCard(
-      backgroundColor: Colors.black.withValues(alpha: 0.6),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (markerImage != null) ...[
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child:
-                  // A teacher-uploaded marker is a real Firebase Storage
-                  // URL; the built-in curriculum's marker is a bundled
-                  // asset (`/markers/QxWy.jpg`) -- `Image.network` can
-                  // never resolve the latter (no scheme/host), so it must
-                  // go through `Image.asset` instead.
-                  isNetworkMarker(markerImage!)
-                  ? Image.network(
-                      markerImage!,
-                      height: 96,
-                      fit: BoxFit.contain,
-                      // A broken/unreachable marker-image URL should
-                      // never block the actual instruction text below it
-                      // -- just drop the thumbnail silently.
-                      errorBuilder: (context, error, stackTrace) =>
-                          const SizedBox.shrink(),
-                    )
-                  : Image.asset(
-                      markerAssetPath(markerImage!),
-                      height: 96,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) =>
-                          const SizedBox.shrink(),
-                    ),
-            ),
-            const SizedBox(height: 12),
-          ],
-          Text(
-            text,
-            textAlign: TextAlign.center,
-            style: ShadTheme.of(
-              context,
-            ).textTheme.h4.copyWith(color: Colors.white),
-          ),
-        ],
-      ),
     );
   }
 }
