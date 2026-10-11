@@ -1,6 +1,8 @@
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:ar_science_explorer/core/theme/app_theme.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:ar_science_explorer/core/models/student_record.dart';
 import 'package:ar_science_explorer/core/services/access_code_service.dart';
@@ -59,7 +61,7 @@ void main() {
             ),
             ...studentProviderOverridesFor('111111', services: services),
           ],
-          child: MaterialApp.router(routerConfig: router),
+          child: ShadApp.router(theme: appShadTheme, routerConfig: router),
         ),
       );
       await tester.pumpAndSettle();
@@ -67,7 +69,7 @@ void main() {
       // Every curriculum lesson (q1w1..q3w8) now carries a built-in pre-test
       // bank, so this case needs an id that is deliberately outside the
       // curriculum to exercise the missing-bank path.
-      router.go('/quiz/q4w1/pre');
+      router.go('/quiz/q9w9/pre');
       await tester.pumpAndSettle();
 
       expect(find.text('Test unavailable'), findsOneWidget);
@@ -122,7 +124,7 @@ void main() {
             ),
             ...studentProviderOverridesFor('111111', services: services),
           ],
-          child: MaterialApp.router(routerConfig: router),
+          child: ShadApp.router(theme: appShadTheme, routerConfig: router),
         ),
       );
       await tester.pumpAndSettle();
@@ -209,7 +211,7 @@ void main() {
             ),
             ...studentProviderOverridesFor('111111', services: services),
           ],
-          child: MaterialApp.router(routerConfig: router),
+          child: ShadApp.router(theme: appShadTheme, routerConfig: router),
         ),
       );
       await tester.pumpAndSettle();
@@ -276,7 +278,7 @@ void main() {
             ),
             ...studentProviderOverridesFor('111111', services: services),
           ],
-          child: MaterialApp.router(routerConfig: router),
+          child: ShadApp.router(theme: appShadTheme, routerConfig: router),
         ),
       );
       await tester.pumpAndSettle();
@@ -331,7 +333,7 @@ void main() {
             ),
             ...studentProviderOverridesFor('111111', services: services),
           ],
-          child: MaterialApp.router(routerConfig: router),
+          child: ShadApp.router(theme: appShadTheme, routerConfig: router),
         ),
       );
       await tester.pumpAndSettle();

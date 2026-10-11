@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../core/services/access_code_service.dart';
 import '../access_code/access_code_sheet.dart';
@@ -12,19 +13,17 @@ class ReviewTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = ShadTheme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.celebration, size: 48),
+          Icon(LucideIcons.partyPopper, size: 48, color: scheme.primary),
           const SizedBox(height: 12),
-          Text(
-            'Lesson Complete',
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
+          Text('Lesson Complete', style: ShadTheme.of(context).textTheme.h3),
           const SizedBox(height: 24),
-          OutlinedButton(
+          ShadButton.outline(
             onPressed: vm.hasPostTest && vm.postTestEligible
                 ? () {
                     vm.onStartPostTest();
@@ -50,7 +49,7 @@ class ReviewTab extends StatelessWidget {
           // doesn't pass.
           if (vm.hasPostTest && !vm.postTestEligible) ...[
             const SizedBox(height: 8),
-            FilledButton.tonalIcon(
+            ShadButton.secondary(
               key: const Key('review-tab-enter-retake-code'),
               onPressed: () => showAccessCodeSheet(
                 context,
@@ -60,12 +59,18 @@ class ReviewTab extends StatelessWidget {
                 targetType: AccessCodeTarget.quiz,
                 title: 'Enter retake code',
               ),
-              icon: const Icon(Icons.vpn_key_outlined, size: 18),
-              label: const Text('Enter retake code'),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(LucideIcons.keyRound, size: 16),
+                  SizedBox(width: 8),
+                  Text('Enter retake code'),
+                ],
+              ),
             ),
           ],
           const SizedBox(height: 8),
-          FilledButton(
+          ShadButton(
             onPressed: () => context.go('/progress'),
             child: const Text('Go to Progress'),
           ),

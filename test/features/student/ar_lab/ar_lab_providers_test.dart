@@ -230,4 +230,17 @@ void main() {
       expect(viewModel.detectedLesson, isNull);
     },
   );
+
+  test(
+    'onMarkerLost keeps the detected lesson so the card stays with the model',
+    () async {
+      final viewModel = await _buildViewModel('q1w1');
+
+      viewModel.onMarkerFound('DemocritusAtomQ1W1');
+      expect(viewModel.detectedLesson?.id, 'q1w1');
+
+      viewModel.onMarkerLost('DemocritusAtomQ1W1');
+      expect(viewModel.detectedLesson?.id, 'q1w1');
+    },
+  );
 }

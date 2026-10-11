@@ -2,6 +2,7 @@ import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:ar_science_explorer/core/services/access_code_service.dart';
 import 'package:ar_science_explorer/core/services/quiz_attempt_service.dart';
 import 'package:ar_science_explorer/features/student/ar_lab/ar_lab_providers.dart';
@@ -58,7 +59,8 @@ Widget _wrap(Widget child) {
       ),
     ],
   );
-  return MaterialApp.router(routerConfig: router);
+  // ShadApp, not MaterialApp: ReviewTab reads ShadTheme.of(context).
+  return ShadApp.router(routerConfig: router);
 }
 
 void main() {
@@ -76,12 +78,12 @@ void main() {
       await tester.pumpWidget(_wrap(ReviewTab(vm: vm)));
 
       final buttonFinder = find.widgetWithText(
-        OutlinedButton,
+        ShadButton,
         'Start Post-Test',
       );
       expect(buttonFinder, findsOneWidget);
 
-      final button = tester.widget<OutlinedButton>(buttonFinder);
+      final button = tester.widget<ShadButton>(buttonFinder);
       expect(button.onPressed, isNotNull);
 
       await tester.tap(buttonFinder);
@@ -104,10 +106,10 @@ void main() {
       await tester.pumpWidget(_wrap(ReviewTab(vm: vm)));
 
       expect(find.text('Start Post-Test'), findsNothing);
-      final buttonFinder = find.widgetWithText(OutlinedButton, reason);
+      final buttonFinder = find.widgetWithText(ShadButton, reason);
       expect(buttonFinder, findsOneWidget);
 
-      final button = tester.widget<OutlinedButton>(buttonFinder);
+      final button = tester.widget<ShadButton>(buttonFinder);
       expect(button.onPressed, isNull);
     },
   );
@@ -122,12 +124,12 @@ void main() {
 
       expect(find.text('Start Post-Test'), findsNothing);
       final buttonFinder = find.widgetWithText(
-        OutlinedButton,
+        ShadButton,
         'No Post-Test for this lesson',
       );
       expect(buttonFinder, findsOneWidget);
 
-      final button = tester.widget<OutlinedButton>(buttonFinder);
+      final button = tester.widget<ShadButton>(buttonFinder);
       expect(button.onPressed, isNull);
     },
   );
@@ -139,7 +141,7 @@ void main() {
 
       await tester.pumpWidget(_wrap(ReviewTab(vm: vm)));
 
-      final buttonFinder = find.widgetWithText(FilledButton, 'Go to Progress');
+      final buttonFinder = find.widgetWithText(ShadButton, 'Go to Progress');
       expect(buttonFinder, findsOneWidget);
 
       await tester.tap(buttonFinder);

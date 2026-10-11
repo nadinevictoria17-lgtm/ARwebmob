@@ -8,6 +8,7 @@
 // `AccessCodeService.redeem` directly the way `_AccessCodeBox` already does)
 // rather than re-implementing the form.
 import 'package:flutter/material.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../core/services/access_code_service.dart';
 
@@ -89,6 +90,7 @@ class _AccessCodeSheetState extends State<AccessCodeSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = ShadTheme.of(context).colorScheme;
     return Padding(
       padding: EdgeInsets.only(
         left: 16,
@@ -100,20 +102,32 @@ class _AccessCodeSheetState extends State<AccessCodeSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(widget.title, style: Theme.of(context).textTheme.titleMedium),
+          Row(
+            children: [
+              Icon(LucideIcons.keyRound, size: 18, color: scheme.mutedForeground),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(widget.title, style: ShadTheme.of(context).textTheme.h4),
+              ),
+            ],
+          ),
           const SizedBox(height: 12),
-          TextField(
+          ShadInput(
             controller: _controller,
             textCapitalization: TextCapitalization.characters,
-            decoration: const InputDecoration(hintText: 'ENTER CODE HERE'),
+            placeholder: const Text('ENTER CODE HERE'),
             onSubmitted: (_) => _submit(),
           ),
           const SizedBox(height: 12),
-          FilledButton(
+          ShadButton(
+            width: double.infinity,
             onPressed: _loading ? null : _submit,
             child: Text(_loading ? 'Applying...' : 'Apply Code'),
           ),
-          if (_message != null) ...[const SizedBox(height: 8), Text(_message!)],
+          if (_message != null) ...[
+            const SizedBox(height: 8),
+            Text(_message!, style: ShadTheme.of(context).textTheme.muted),
+          ],
         ],
       ),
     );

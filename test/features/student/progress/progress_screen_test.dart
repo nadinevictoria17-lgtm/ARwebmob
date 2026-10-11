@@ -1,13 +1,14 @@
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:ar_science_explorer/core/data/curriculum_data.dart';
 import 'package:ar_science_explorer/core/models/quiz_attempt.dart';
 import 'package:ar_science_explorer/core/models/student_record.dart';
 import 'package:ar_science_explorer/core/models/subject_key.dart';
 import 'package:ar_science_explorer/core/services/lesson_repository.dart';
 import 'package:ar_science_explorer/core/services/student_repository.dart';
+import 'package:ar_science_explorer/core/theme/app_theme.dart';
 import 'package:ar_science_explorer/features/student/progress/progress_providers.dart';
 import 'package:ar_science_explorer/features/student/progress/progress_screen.dart';
 
@@ -61,7 +62,7 @@ void main() {
             (ref) => Stream.value(viewModel),
           ),
         ],
-        child: const MaterialApp(home: ProgressScreen()),
+        child: ShadApp(theme: appShadTheme, home: const ProgressScreen()),
       ),
     );
     await tester.pumpAndSettle();

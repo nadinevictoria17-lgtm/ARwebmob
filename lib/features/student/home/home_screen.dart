@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../core/services/access_code_service.dart';
 import '../../../core/services/progress_calculator.dart';
@@ -25,49 +25,50 @@ class HomeScreen extends ConsumerWidget {
     return asyncViewModel.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stack) => _HomeError(error: error),
-      data: (vm) => ListView(
-        padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
-        children: [
-          _Greeting(vm: vm),
-          const SizedBox(height: 20),
-          _ProgressCard(vm: vm),
-          const SizedBox(height: 16),
-          _ContinueLessonCard(vm: vm),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: _StatTile(
-                  icon: Icons.menu_book_rounded,
-                  label: 'Lessons completed',
-                  value: '${vm.lessonsCompletedCount}',
-                  accent: AppColors.chemistry,
+      data: (vm) {
+        final scheme = ShadTheme.of(context).colorScheme;
+        return ListView(
+          padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
+          children: [
+            _Greeting(vm: vm),
+            const SizedBox(height: 20),
+            _ProgressCard(vm: vm),
+            const SizedBox(height: 16),
+            _ContinueLessonCard(vm: vm),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: _StatTile(
+                    icon: LucideIcons.bookOpen,
+                    label: 'Lessons completed',
+                    value: '${vm.lessonsCompletedCount}',
+                    accent: scheme.custom['chemistry'] ?? scheme.primary,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _StatTile(
-                  icon: Icons.fact_check_rounded,
-                  label: 'Quizzes taken',
-                  value: '${vm.quizzesTakenCount}',
-                  accent: AppColors.physics,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _StatTile(
+                    icon: LucideIcons.clipboardCheck,
+                    label: 'Quizzes taken',
+                    value: '${vm.quizzesTakenCount}',
+                    accent: scheme.custom['physics'] ?? scheme.primary,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'Recent quiz attempts',
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 8),
-          _RecentAttempts(attempts: vm.lastAttempts),
-          const SizedBox(height: 20),
-          _AccessCodeBox(onRedeem: vm.onRedeemCode),
-        ],
-      ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Recent quiz attempts',
+              style: ShadTheme.of(context).textTheme.h4,
+            ),
+            const SizedBox(height: 8),
+            _RecentAttempts(attempts: vm.lastAttempts),
+            const SizedBox(height: 20),
+            _AccessCodeBox(onRedeem: vm.onRedeemCode),
+          ],
+        );
+      },
     );
   }
 }
@@ -79,29 +80,24 @@ class _HomeError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = ShadTheme.of(context).colorScheme;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.cloud_off_rounded,
-              size: 40,
-              color: AppColors.inkMuted,
-            ),
+            Icon(LucideIcons.cloudOff, size: 40, color: scheme.mutedForeground),
             const SizedBox(height: 12),
             Text(
               "Couldn't load your progress",
-              style: Theme.of(context).textTheme.titleMedium,
+              style: ShadTheme.of(context).textTheme.h4,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 4),
             Text(
               'Check your connection and try again.',
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: AppColors.inkMuted),
+              style: ShadTheme.of(context).textTheme.muted,
               textAlign: TextAlign.center,
             ),
           ],
@@ -121,14 +117,16 @@ class _Greeting extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    final scheme = ShadTheme.of(context).colorScheme;
+    final textTheme = ShadTheme.of(context).textTheme;
+    final physics = scheme.custom['physics'] ?? scheme.primary;
     return Row(
           children: [
             Container(
               width: 52,
               height: 52,
               decoration: BoxDecoration(
-                color: AppColors.physics.withValues(alpha: 0.12),
+                color: physics.withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
               child: Center(
@@ -136,10 +134,7 @@ class _Greeting extends StatelessWidget {
                   vm.studentDisplayName.isNotEmpty
                       ? vm.studentDisplayName[0].toUpperCase()
                       : '?',
-                  style: textTheme.titleLarge?.copyWith(
-                    color: AppColors.physics,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: textTheme.h3.copyWith(color: physics),
                 ),
               ),
             ),
@@ -148,18 +143,11 @@ class _Greeting extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Hi, ${vm.studentDisplayName}!',
-                    style: textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
+                  Text('Hi, ${vm.studentDisplayName}!', style: textTheme.h3),
                   if (vm.currentQuarter != null && vm.currentWeek != null)
                     Text(
                       'Quarter ${vm.currentQuarter} · Week ${vm.currentWeek}',
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: AppColors.inkMuted,
-                      ),
+                      style: textTheme.muted,
                     ),
                 ],
               ),
@@ -180,40 +168,39 @@ class _ProgressCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final percent = (vm.percentComplete * 100).round();
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Text(
-                  'Your progress',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-                ),
-                const Spacer(),
-                Text(
-                  '$percent%',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: AppColors.physics,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: LinearProgressIndicator(
-                value: vm.percentComplete,
-                minHeight: 8,
+    final scheme = ShadTheme.of(context).colorScheme;
+    final physics = scheme.custom['physics'] ?? scheme.primary;
+    return ShadCard(
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                'Your progress',
+                style: ShadTheme.of(context).textTheme.h4,
               ),
+              const Spacer(),
+              Text(
+                '$percent%',
+                style: ShadTheme.of(
+                  context,
+                ).textTheme.h4.copyWith(color: physics),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(
+              value: vm.percentComplete,
+              minHeight: 8,
+              color: physics,
+              backgroundColor: scheme.muted,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     ).animate().fadeIn(duration: 300.ms, delay: 60.ms, curve: Curves.easeOut);
   }
@@ -232,7 +219,11 @@ class _ContinueLessonCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final lesson = vm.continueLesson;
-    final accent = lesson?.subject.accentColor ?? AppColors.physics;
+    final scheme = ShadTheme.of(context).colorScheme;
+    final physics = scheme.custom['physics'] ?? scheme.primary;
+    final accent = lesson != null
+        ? (scheme.custom[lesson.subject.name] ?? physics)
+        : physics;
 
     return Material(
           color: accent,
@@ -254,9 +245,7 @@ class _ContinueLessonCard extends StatelessWidget {
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      lesson != null
-                          ? Icons.play_arrow_rounded
-                          : Icons.explore_rounded,
+                      lesson != null ? LucideIcons.play : LucideIcons.compass,
                       color: Colors.white,
                     ),
                   ),
@@ -289,7 +278,7 @@ class _ContinueLessonCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const Icon(Icons.arrow_forward_rounded, color: Colors.white),
+                  const Icon(LucideIcons.arrowRight, color: Colors.white),
                 ],
               ),
             ),
@@ -322,35 +311,23 @@ class _StatTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(7),
-              decoration: BoxDecoration(
-                color: accent.withValues(alpha: 0.14),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(icon, size: 16, color: accent),
+    return ShadCard(
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(7),
+            decoration: BoxDecoration(
+              color: accent.withValues(alpha: 0.14),
+              borderRadius: BorderRadius.circular(8),
             ),
-            const SizedBox(height: 10),
-            Text(
-              value,
-              style: Theme.of(
-                context,
-              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
-            ),
-            Text(
-              label,
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: AppColors.inkMuted),
-            ),
-          ],
-        ),
+            child: Icon(icon, size: 16, color: accent),
+          ),
+          const SizedBox(height: 10),
+          Text(value, style: ShadTheme.of(context).textTheme.h3),
+          Text(label, style: ShadTheme.of(context).textTheme.muted),
+        ],
       ),
     ).animate().fadeIn(duration: 300.ms, delay: 160.ms, curve: Curves.easeOut);
   }
@@ -363,36 +340,47 @@ class _RecentAttempts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = ShadTheme.of(context).colorScheme;
     if (attempts.isEmpty) {
-      return Card(
-        child: Padding(
-          padding: const EdgeInsets.all(18),
-          child: Row(
-            children: [
-              const Icon(Icons.quiz_outlined, color: AppColors.inkMuted),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  "No quiz attempts yet — they'll show up here once you take one.",
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(color: AppColors.inkMuted),
-                ),
+      return ShadCard(
+        padding: const EdgeInsets.all(18),
+        child: Row(
+          children: [
+            Icon(LucideIcons.clipboardList, color: scheme.mutedForeground),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                "No quiz attempts yet — they'll show up here once you take one.",
+                style: ShadTheme.of(context).textTheme.muted,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       );
     }
 
-    return Card(
+    return ShadCard(
+      padding: EdgeInsets.zero,
       child: Column(
         children: [
           for (var i = 0; i < attempts.length; i++) ...[
-            if (i > 0) const Divider(height: 1),
-            ListTile(
-              title: Text(attempts[i].quizId as String),
-              trailing: _ScoreBadge(score: attempts[i].score as num),
+            if (i > 0) Divider(height: 1, color: scheme.border),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      attempts[i].quizId as String,
+                      style: ShadTheme.of(context).textTheme.p,
+                    ),
+                  ),
+                  _ScoreBadge(score: attempts[i].score as num),
+                ],
+              ),
             ),
           ],
         ],
@@ -407,26 +395,17 @@ class _ScoreBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = ShadTheme.of(context).colorScheme;
     final band = scoreBandFor(score);
     final color = switch (band) {
       ScoreBand.good => AppColors.success,
-      ScoreBand.caution => AppColors.chemistry,
-      ScoreBand.needsWork => AppColors.destructive,
+      ScoreBand.caution => scheme.custom['chemistry'] ?? scheme.primary,
+      ScoreBand.needsWork => scheme.destructive,
     };
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        '$score%',
-        style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.w700,
-          fontSize: 13,
-        ),
-      ),
+    return ShadBadge(
+      backgroundColor: color.withValues(alpha: 0.14),
+      foregroundColor: color,
+      child: Text('$score%'),
     );
   }
 }
@@ -466,96 +445,81 @@ class _AccessCodeBoxState extends State<_AccessCodeBox> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+    final scheme = ShadTheme.of(context).colorScheme;
+    const success = AppColors.success;
+    return ShadCard(
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Icon(LucideIcons.keyRound, size: 18, color: scheme.mutedForeground),
+              const SizedBox(width: 8),
+              Text(
+                'Have a code from your teacher?',
+                style: ShadTheme.of(context).textTheme.h4,
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          // This box only ever redeems a whole-subject code (it has no
+          // specific lesson/test to scope the redemption to) — a
+          // lesson-specific or test-retake code has to be entered where
+          // that lesson/test actually is (the locked lesson card, or the
+          // "Enter retake code" button on a failed post-test), otherwise
+          // AccessCodeService.redeem correctly rejects it as "not valid
+          // for this lesson/test", which reads confusingly here without
+          // this context.
+          Text(
+            'For a subject unlock code. A lesson or test-retake code goes '
+            'on that lesson/test\'s own screen.',
+            style: ShadTheme.of(context).textTheme.muted,
+          ),
+          const SizedBox(height: 10),
+          ShadInput(
+            controller: _controller,
+            textCapitalization: TextCapitalization.characters,
+            onSubmitted: (_) => _loading ? null : _submit(),
+            placeholder: const Text('Enter code here'),
+          ),
+          const SizedBox(height: 10),
+          ShadButton(
+            onPressed: _loading ? null : _submit,
+            child: _loading
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Text('Apply code'),
+          ),
+          if (_message != null) ...[
+            const SizedBox(height: 10),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
-                  Icons.vpn_key_rounded,
-                  size: 18,
-                  color: AppColors.inkMuted,
+                Icon(
+                  _wasSuccess == true
+                      ? LucideIcons.circleCheck
+                      : LucideIcons.circleAlert,
+                  size: 16,
+                  color: _wasSuccess == true ? success : scheme.destructive,
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  'Have a code from your teacher?',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    _message!,
+                    style: TextStyle(
+                      color: _wasSuccess == true ? success : scheme.destructive,
+                      fontSize: 13,
+                    ),
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 4),
-            // This box only ever redeems a whole-subject code (it has no
-            // specific lesson/test to scope the redemption to) — a
-            // lesson-specific or test-retake code has to be entered where
-            // that lesson/test actually is (the locked lesson card, or the
-            // "Enter retake code" button on a failed post-test), otherwise
-            // AccessCodeService.redeem correctly rejects it as "not valid
-            // for this lesson/test", which reads confusingly here without
-            // this context.
-            Text(
-              'For a subject unlock code. A lesson or test-retake code goes '
-              'on that lesson/test\'s own screen.',
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: AppColors.inkMuted),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: _controller,
-              textCapitalization: TextCapitalization.characters,
-              onSubmitted: (_) => _loading ? null : _submit(),
-              decoration: const InputDecoration(hintText: 'Enter code here'),
-            ),
-            const SizedBox(height: 10),
-            FilledButton(
-              onPressed: _loading ? null : _submit,
-              child: _loading
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : const Text('Apply code'),
-            ),
-            if (_message != null) ...[
-              const SizedBox(height: 10),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(
-                    _wasSuccess == true
-                        ? Icons.check_circle_rounded
-                        : Icons.error_outline_rounded,
-                    size: 16,
-                    color: _wasSuccess == true
-                        ? AppColors.success
-                        : AppColors.destructive,
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      _message!,
-                      style: TextStyle(
-                        color: _wasSuccess == true
-                            ? AppColors.success
-                            : AppColors.destructive,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
           ],
-        ),
+        ],
       ),
     ).animate().fadeIn(duration: 300.ms, delay: 240.ms, curve: Curves.easeOut);
   }

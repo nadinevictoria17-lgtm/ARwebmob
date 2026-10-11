@@ -1,6 +1,7 @@
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:ar_science_explorer/core/services/access_code_service.dart';
 import 'package:ar_science_explorer/core/services/quiz_attempt_service.dart';
 import 'package:ar_science_explorer/features/student/ar_lab/ar_lab_providers.dart';
@@ -41,7 +42,8 @@ ArLabViewModel _buildViewModel({
   );
 }
 
-Widget _wrap(Widget child) => MaterialApp(home: Scaffold(body: child));
+// ShadApp, not MaterialApp: ReadTab reads ShadTheme.of(context).
+Widget _wrap(Widget child) => ShadApp(home: Scaffold(body: child));
 
 void main() {
   testWidgets(
@@ -59,10 +61,10 @@ void main() {
 
       expect(find.text(vm.title), findsOneWidget);
       expect(find.text(vm.summary), findsOneWidget);
-      expect(find.widgetWithText(FilledButton, 'Mark as Read'), findsOneWidget);
+      expect(find.widgetWithText(ShadButton, 'Mark as Read'), findsOneWidget);
       expect(find.text('Read'), findsNothing);
 
-      await tester.tap(find.widgetWithText(FilledButton, 'Mark as Read'));
+      await tester.tap(find.widgetWithText(ShadButton, 'Mark as Read'));
       await tester.pump();
 
       expect(markAsReadCalled, isTrue);
@@ -77,8 +79,8 @@ void main() {
     await tester.pumpWidget(_wrap(ReadTab(vm: vm)));
 
     expect(find.text('Read'), findsOneWidget);
-    expect(find.byType(FilledButton), findsNothing);
-    expect(find.byType(Chip), findsOneWidget);
+    expect(find.byType(ShadButton), findsNothing);
+    expect(find.byType(ShadBadge), findsOneWidget);
   });
 
   testWidgets(

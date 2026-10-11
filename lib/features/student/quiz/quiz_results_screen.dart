@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../core/services/access_code_service.dart';
 import '../access_code/access_code_sheet.dart';
@@ -104,43 +105,72 @@ class _QuizResultsScreenState extends State<QuizResultsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = ShadTheme.of(context).colorScheme;
+    final textTheme = ShadTheme.of(context).textTheme;
+
     return Scaffold(
       body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              _passed ? 'Nice work!' : 'Not quite there yet',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            Text('${widget.score}%'),
-            if (!_passed)
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(
-                  widget.isPreTest
-                      ? "This is a pre-test — you can retry it anytime, no code needed."
-                      : 'Ask your teacher for a retake code to try this test again.',
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                _passed ? LucideIcons.partyPopper : LucideIcons.refreshCcw,
+                size: 48,
+                color: _passed ? scheme.primary : scheme.mutedForeground,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                _passed ? 'Nice work!' : 'Not quite there yet',
+                style: textTheme.h2,
+              ),
+              const SizedBox(height: 4),
+              Text('${widget.score}%', style: textTheme.h1),
+              if (!_passed)
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                    widget.isPreTest
+                        ? "This is a pre-test — you can retry it anytime, no code needed."
+                        : 'Ask your teacher for a retake code to try this test again.',
+                    textAlign: TextAlign.center,
+                    style: textTheme.muted.copyWith(
+                      color: scheme.mutedForeground,
+                    ),
+                  ),
                 ),
-              ),
-            if (!_passed && !widget.isPreTest && _canEnterRetakeCode)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: OutlinedButton(
-                  onPressed: _enterRetakeCode,
-                  child: const Text('Enter retake code'),
+              if (!_passed && !widget.isPreTest && _canEnterRetakeCode)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: ShadButton.outline(
+                    onPressed: _enterRetakeCode,
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(LucideIcons.keyRound, size: 16),
+                        SizedBox(width: 8),
+                        Text('Enter retake code'),
+                      ],
+                    ),
+                  ),
                 ),
+              ShadButton(
+                onPressed: () => context.go('/progress'),
+                child: const Text('View My Progress'),
               ),
-            FilledButton(
-              onPressed: () => context.go('/progress'),
-              child: const Text('View My Progress'),
-            ),
-            if (_passed && _secondsLeft > 0)
-              TextButton(
-                onPressed: _cancelAutoContinue,
-                child: Text('Continuing in $_secondsLeft s — tap to stay here'),
-              ),
-          ],
+              if (_passed && _secondsLeft > 0)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: ShadButton.link(
+                    onPressed: _cancelAutoContinue,
+                    child: Text(
+                      'Continuing in $_secondsLeft s — tap to stay here',
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QCARConfig>
+  <Tracking>
+    <ImageTarget name="q4w8" size="0.190000 0.127197" />
+    <ImageTarget name="q4w7" size="0.190000 0.149340" />
+    <ImageTarget name="q4w6" size="0.190000 0.190000" />
+    <ImageTarget name="q4w5" size="0.190000 0.275191" />
+    <ImageTarget name="q4w3" size="0.190000 0.126667" />
+    <ImageTarget name="q4w2" size="0.190000 0.126480" />
+    <ImageTarget name="q4w1" size="0.190000 0.106875" />
+    <ImageTarget name="q3w8spoon" size="0.190000 0.201685" />
+    <ImageTarget name="q3w7termometer" size="0.190000 0.190000" />
+    <ImageTarget name="q3w6jeepney" size="0.190000 0.133507" />
+    <ImageTarget name="q3w5car" size="0.190000 0.125374" />
+    <ImageTarget name="q3w4compass" size="0.190000 0.190000" />
+    <ImageTarget name="q3w3seesaw" size="0.190000 0.106698" />
+    <ImageTarget name="q3w2inclined_plane_slide_playground" size="0.190000 0.126920" />
+    <ImageTarget name="q3w1spring" size="0.190000 0.134428" />
+    <ImageTarget name="FoodChainQ2W8" size="0.190000 0.126667" />
+    <ImageTarget name="BioOrganizationQ2W7" size="0.190000 0.106698" />
+    <ImageTarget name="CellReproductionQ2W6" size="0.190000 0.106795" />
+    <ImageTarget name="MeiosisAndMitosisQ2W5" size="19.000000 10.687500" />
+    <ImageTarget name="AnimalAndPlantCellQ2W4" size="0.190000 0.140645" />
+    <ImageTarget name="CellsQ2W3" size="0.190000 0.175486" />
+    <ImageTarget name="CellAnatomyQ2W2" size="0.190000 0.126667" />
+    <ImageTarget name="MicroscopeQ2W1" size="0.190000 0.190852" />
+    <ImageTarget name="BeakerLowMediumHighDissolveQ1W8" size="0.190000 0.142500" />
+    <ImageTarget name="SolventSoluteQ1W7" size="0.190000 0.106875" />
+    <ImageTarget name="TeaspoonMililitergramsCentimeterQ1W6" size="0.190000 0.126667" />
+    <ImageTarget name="MoleculeAnimationQ1W4" size="0.190000 0.190000" />
+    <ImageTarget name="SolidLiquidGasQ1W3" size="0.190000 0.087245" />
+    <ImageTarget name="AtomsQ1W2" size="0.190000 0.121900" />
+    <ImageTarget name="DemocritusAtomQ1W1" size="0.190000 0.229839" />
+  </Tracking>
+</QCARConfig>

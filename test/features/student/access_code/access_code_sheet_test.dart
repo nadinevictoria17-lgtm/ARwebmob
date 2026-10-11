@@ -1,10 +1,12 @@
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:ar_science_explorer/core/models/student_record.dart';
 import 'package:ar_science_explorer/core/services/access_code_service.dart';
 import 'package:ar_science_explorer/core/services/quiz_attempt_service.dart';
 import 'package:ar_science_explorer/core/services/student_repository.dart';
+import 'package:ar_science_explorer/core/theme/app_theme.dart';
 import 'package:ar_science_explorer/features/student/access_code/access_code_sheet.dart';
 
 StudentRecord _blankStudent(String id) => StudentRecord(
@@ -40,7 +42,8 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
+        ShadApp(
+          theme: appShadTheme,
           home: Scaffold(
             body: Builder(
               builder: (context) => ElevatedButton(
@@ -61,7 +64,7 @@ void main() {
       await tester.tap(find.text('open'));
       await tester.pumpAndSettle();
 
-      await tester.enterText(find.byType(TextField), 'onelesson');
+      await tester.enterText(find.byType(ShadInput), 'onelesson');
       await tester.tap(find.text('Apply Code'));
       await tester.pumpAndSettle();
 
@@ -89,7 +92,8 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
+        ShadApp(
+          theme: appShadTheme,
           home: Scaffold(
             body: Builder(
               builder: (context) => ElevatedButton(
@@ -110,7 +114,7 @@ void main() {
       await tester.tap(find.text('open'));
       await tester.pumpAndSettle();
 
-      await tester.enterText(find.byType(TextField), 'bogus');
+      await tester.enterText(find.byType(ShadInput), 'bogus');
       await tester.tap(find.text('Apply Code'));
       await tester.pumpAndSettle();
 

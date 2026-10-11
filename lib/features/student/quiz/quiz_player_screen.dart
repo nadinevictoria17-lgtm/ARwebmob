@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../core/models/question_type.dart';
 import '../../../core/quiz_id.dart';
 import '../../../core/models/quiz_phase.dart';
 import '../../../core/services/access_code_service.dart';
-import '../../../core/theme/app_theme.dart';
 import 'quiz_session_controller.dart';
 import 'quiz_results_screen.dart';
 
@@ -42,6 +42,7 @@ class QuizPlayerScreen extends ConsumerWidget {
     final visibleOptions = isTrueFalse
         ? question.options.sublist(0, 2)
         : question.options;
+    final scheme = ShadTheme.of(context).colorScheme;
 
     if (state.isComplete) {
       final parsed = parseBuiltinId(controller.quizId);
@@ -78,8 +79,8 @@ class QuizPlayerScreen extends ConsumerWidget {
           title: Text(
             'Question ${state.questionIndex + 1} of ${controller.questions.length}',
           ),
-          leading: IconButton(
-            icon: const Icon(Icons.close),
+          leading: ShadIconButton.ghost(
+            icon: const Icon(LucideIcons.x),
             onPressed: () => _confirmExit(context, controller),
           ),
         ),
@@ -90,6 +91,7 @@ class QuizPlayerScreen extends ConsumerWidget {
               child: LinearProgressIndicator(
                 value: (state.questionIndex + 1) / controller.questions.length,
                 minHeight: 4,
+                color: scheme.primary,
               ),
             ),
             Expanded(
@@ -100,7 +102,7 @@ class QuizPlayerScreen extends ConsumerWidget {
                   children: [
                     Text(
                       question.question,
-                      style: Theme.of(context).textTheme.titleLarge,
+                      style: ShadTheme.of(context).textTheme.h3,
                     ),
                     const SizedBox(height: 16),
                     for (var i = 0; i < visibleOptions.length; i++)
@@ -139,7 +141,7 @@ class QuizPlayerScreen extends ConsumerWidget {
                               },
                       ),
                     if (!state.showResult)
-                      TextButton.icon(
+                      ShadButton.ghost(
                         onPressed:
                             state.hintsUsed < 3 &&
                                 !state.hintedQuestionIndices.contains(
@@ -147,14 +149,25 @@ class QuizPlayerScreen extends ConsumerWidget {
                                 )
                             ? controller.useHint
                             : null,
-                        icon: const Icon(Icons.lightbulb_outline),
-                        label: Text('Hint (${3 - state.hintsUsed} left)'),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(LucideIcons.lightbulb, size: 16),
+                            const SizedBox(width: 8),
+                            Text('Hint (${3 - state.hintsUsed} left)'),
+                          ],
+                        ),
                       ),
                     if (state.hintedQuestionIndices.contains(
                           state.questionIndex,
                         ) &&
                         !state.showResult)
-                      Text('Hint: ${question.hint}'),
+                      Text(
+                        'Hint: ${question.hint}',
+                        style: ShadTheme.of(
+                          context,
+                        ).textTheme.muted.copyWith(color: scheme.mutedForeground),
+                      ),
                     // The only feedback signal during the brief auto-advance pause
                     // (see _AnswerOption's onTap above) -- sized up so it's
                     // actually readable in the ~900ms window before the screen
@@ -168,23 +181,22 @@ class QuizPlayerScreen extends ConsumerWidget {
                           children: [
                             Icon(
                               wasCorrect
-                                  ? Icons.check_circle_rounded
-                                  : Icons.info_rounded,
+                                  ? LucideIcons.circleCheckBig
+                                  : LucideIcons.info,
                               color: wasCorrect
-                                  ? AppColors.success
-                                  : AppColors.chemistry,
+                                  ? scheme.primary
+                                  : scheme.destructive,
                             ),
                             const SizedBox(width: 8),
                             Text(
                               wasCorrect
                                   ? 'Correct!'
                                   : 'Not quite — here\'s the answer',
-                              style: Theme.of(context).textTheme.titleMedium
-                                  ?.copyWith(
+                              style: ShadTheme.of(context).textTheme.h4
+                                  .copyWith(
                                     color: wasCorrect
-                                        ? AppColors.success
-                                        : AppColors.chemistry,
-                                    fontWeight: FontWeight.w700,
+                                        ? scheme.primary
+                                        : scheme.destructive,
                                   ),
                             ),
                           ],
@@ -197,17 +209,21 @@ class QuizPlayerScreen extends ConsumerWidget {
                     // `isComplete` never set — so the results screen never
                     // arrived and the whole attempt was lost, unrecorded.
                     if (state.isSaving)
-                      const Padding(
-                        padding: EdgeInsets.only(top: 16),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16),
                         child: Row(
                           children: [
-                            SizedBox(
+                            const SizedBox(
                               width: 18,
                               height: 18,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             ),
-                            SizedBox(width: 10),
-                            Text('Saving your answers...'),
+                            const SizedBox(width: 10),
+                            Text(
+                              'Saving your answers...',
+                              style: ShadTheme.of(context).textTheme.muted
+                                  .copyWith(color: scheme.mutedForeground),
+                            ),
                           ],
                         ),
                       ),
@@ -219,15 +235,22 @@ class QuizPlayerScreen extends ConsumerWidget {
                           children: [
                             Text(
                               state.saveError!,
-                              style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(color: AppColors.destructive),
+                              style: ShadTheme.of(
+                                context,
+                              ).textTheme.p.copyWith(color: scheme.destructive),
                             ),
                             const SizedBox(height: 8),
-                            FilledButton.icon(
+                            ShadButton(
                               key: const Key('quiz-save-retry'),
                               onPressed: controller.retrySave,
-                              icon: const Icon(Icons.refresh),
-                              label: const Text('Try again'),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(LucideIcons.refreshCw, size: 16),
+                                  SizedBox(width: 8),
+                                  Text('Try again'),
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -252,11 +275,12 @@ class QuizPlayerScreen extends ConsumerWidget {
     // answers.") implied — a student who opened the test just to look at it
     // could tap through this dialog and end up with a locked 0% attempt.
     final isPostTest = !controller.quizId.endsWith('-pre');
-    final confirmed = await showDialog<bool>(
+    final scheme = ShadTheme.of(context).colorScheme;
+    final confirmed = await showShadDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => ShadDialog(
         title: const Text('Exit Test?'),
-        content: Text(
+        description: Text(
           isPostTest
               ? 'Submitting now scores this test using only what you have '
                     'answered so far. You will need a code from your teacher '
@@ -264,14 +288,12 @@ class QuizPlayerScreen extends ConsumerWidget {
               : 'Going back will submit your test with your current answers.',
         ),
         actions: [
-          TextButton(
+          ShadButton.outline(
             onPressed: () => Navigator.pop(context, false),
             child: const Text('Continue Quiz'),
           ),
-          FilledButton(
-            style: isPostTest
-                ? FilledButton.styleFrom(backgroundColor: AppColors.destructive)
-                : null,
+          ShadButton(
+            backgroundColor: isPostTest ? scheme.destructive : null,
             onPressed: () => Navigator.pop(context, true),
             child: const Text('Submit & Exit'),
           ),
@@ -290,9 +312,9 @@ class QuizPlayerScreen extends ConsumerWidget {
     // student can retry from the banner on the quiz screen — popping here
     // would discard the attempt entirely, which is exactly what the old
     // unconditional `context.pop()` did.
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
+    ShadToaster.of(context).show(
+      const ShadToast.destructive(
+        description: Text(
           "Couldn't save your answers — you're still in the test. Check your "
           'connection and tap Try again.',
         ),
@@ -324,6 +346,7 @@ class _AnswerOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = ShadTheme.of(context).colorScheme;
     Color? background;
     Color? borderColor;
     IconData? trailingIcon;
@@ -331,25 +354,25 @@ class _AnswerOption extends StatelessWidget {
 
     if (showResult) {
       if (isCorrectAnswer) {
-        background = AppColors.success.withValues(alpha: 0.10);
-        borderColor = AppColors.success;
-        trailingIcon = Icons.check_circle_rounded;
-        trailingColor = AppColors.success;
+        background = scheme.primary.withValues(alpha: 0.10);
+        borderColor = scheme.primary;
+        trailingIcon = LucideIcons.circleCheckBig;
+        trailingColor = scheme.primary;
       } else if (selected) {
-        background = AppColors.chemistry.withValues(alpha: 0.10);
-        borderColor = AppColors.chemistry;
-        trailingIcon = Icons.circle_outlined;
-        trailingColor = AppColors.chemistry;
+        background = scheme.destructive.withValues(alpha: 0.10);
+        borderColor = scheme.destructive;
+        trailingIcon = LucideIcons.circle;
+        trailingColor = scheme.destructive;
       }
     } else if (selected) {
-      background = AppColors.physics.withValues(alpha: 0.08);
-      borderColor = AppColors.physics;
+      background = scheme.primary.withValues(alpha: 0.08);
+      borderColor = scheme.primary;
     }
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Material(
-        color: background ?? Theme.of(context).cardColor,
+        color: background ?? scheme.card,
         borderRadius: BorderRadius.circular(12),
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
@@ -358,11 +381,13 @@ class _AnswerOption extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: borderColor ?? AppColors.border),
+              border: Border.all(color: borderColor ?? scheme.border),
             ),
             child: Row(
               children: [
-                Expanded(child: Text(label)),
+                Expanded(
+                  child: Text(label, style: ShadTheme.of(context).textTheme.p),
+                ),
                 if (trailingIcon != null)
                   Icon(trailingIcon, size: 20, color: trailingColor),
               ],

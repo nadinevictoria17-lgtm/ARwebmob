@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 /// Renders a lesson's bundled module PDF inline in the Read tab, plus a
 /// full-screen reader for actually studying it.
@@ -61,6 +62,8 @@ class _LessonPdfViewState extends State<LessonPdfView> {
   Widget build(BuildContext context) {
     if (_failed) return const SizedBox.shrink();
 
+    final scheme = ShadTheme.of(context).colorScheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -69,14 +72,20 @@ class _LessonPdfViewState extends State<LessonPdfView> {
             Expanded(
               child: Text(
                 'Lesson module',
-                style: Theme.of(context).textTheme.titleMedium,
+                style: ShadTheme.of(context).textTheme.h4,
               ),
             ),
-            TextButton.icon(
+            ShadButton.ghost(
               key: const Key('read-tab-pdf-fullscreen'),
               onPressed: _openFullScreen,
-              icon: const Icon(Icons.fullscreen, size: 18),
-              label: const Text('Full screen'),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(LucideIcons.maximize2, size: 16),
+                  SizedBox(width: 8),
+                  Text('Full screen'),
+                ],
+              ),
             ),
           ],
         ),
@@ -87,7 +96,7 @@ class _LessonPdfViewState extends State<LessonPdfView> {
           height: 480,
           child: DecoratedBox(
             decoration: BoxDecoration(
-              border: Border.all(color: Theme.of(context).dividerColor),
+              border: Border.all(color: scheme.border),
               borderRadius: BorderRadius.circular(8),
             ),
             child: ClipRRect(

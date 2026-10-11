@@ -19,6 +19,7 @@ import 'dart:typed_data';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:ar_science_explorer/core/models/subject_key.dart';
 import 'package:ar_science_explorer/core/models/teacher_lesson.dart';
 import 'package:ar_science_explorer/core/services/lesson_content_upload_service.dart';
@@ -100,7 +101,8 @@ void main() {
     // the student-side repository read back.
     Uri? launchedUri;
     await tester.pumpWidget(
-      MaterialApp(
+      // ShadApp, not MaterialApp: the widget reads ShadTheme.of(context).
+      ShadApp(
         home: Scaffold(
           body: ContentViewer(
             imageUrls: lesson.contentImageUrls,
@@ -135,7 +137,8 @@ void main() {
     'exercised)',
     (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        // ShadApp, not MaterialApp: the widget reads ShadTheme.of(context).
+        const ShadApp(
           home: Scaffold(
             body: ContentViewer(
               imageUrls: ['https://fake-storage.example/lessons/x/slides.pptx'],

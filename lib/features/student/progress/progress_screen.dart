@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../core/theme/app_theme.dart';
 import 'progress_providers.dart';
@@ -37,21 +37,18 @@ class _ProgressError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = ShadTheme.of(context).colorScheme;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.cloud_off_rounded,
-              size: 40,
-              color: AppColors.inkMuted,
-            ),
+            Icon(LucideIcons.cloudOff, size: 40, color: scheme.mutedForeground),
             const SizedBox(height: 12),
             Text(
               "Couldn't load your progress",
-              style: Theme.of(context).textTheme.titleMedium,
+              style: ShadTheme.of(context).textTheme.h4,
               textAlign: TextAlign.center,
             ),
           ],
@@ -69,6 +66,7 @@ class _SubjectSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = ShadTheme.of(context).colorScheme;
     final accent = section.subject.accentColor;
     final label =
         '${section.subject.name[0].toUpperCase()}${section.subject.name.substring(1)}';
@@ -90,41 +88,33 @@ class _SubjectSection extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Text(
-                    label,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
+                  Text(label, style: ShadTheme.of(context).textTheme.h4),
                   const SizedBox(width: 8),
                   if (section.lessons.isNotEmpty)
                     Text(
                       '$completedCount/${section.lessons.length}',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.inkMuted,
+                      style: ShadTheme.of(context).textTheme.small.copyWith(
+                        color: scheme.mutedForeground,
                       ),
                     ),
                 ],
               ),
               const SizedBox(height: 8),
               if (section.lessons.isEmpty)
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Text(
-                      'No lessons in this subject yet.',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.inkMuted,
-                      ),
-                    ),
+                ShadCard(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                    'No lessons in this subject yet.',
+                    style: ShadTheme.of(context).textTheme.muted,
                   ),
                 )
               else
-                Card(
+                ShadCard(
+                  padding: EdgeInsets.zero,
                   child: Column(
                     children: [
                       for (var i = 0; i < section.lessons.length; i++) ...[
-                        if (i > 0) const Divider(height: 1),
+                        if (i > 0) Divider(height: 1, color: scheme.border),
                         _LessonRow(lesson: section.lessons[i], accent: accent),
                       ],
                     ],
@@ -161,36 +151,33 @@ class _LessonRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: Icon(
-        lesson.isCompleted
-            ? Icons.check_circle_rounded
-            : Icons.radio_button_unchecked,
-        color: lesson.isCompleted ? AppColors.success : AppColors.inkMuted,
-      ),
-      title: Text(lesson.title),
-      trailing: lesson.isCompleted
-          ? Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(
-                color: AppColors.success.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: const Text(
-                'Completed',
-                style: TextStyle(
-                  color: AppColors.success,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
+    final scheme = ShadTheme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Row(
+        children: [
+          Icon(
+            lesson.isCompleted ? LucideIcons.circleCheck : LucideIcons.circle,
+            color: lesson.isCompleted ? AppColors.success : scheme.mutedForeground,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(lesson.title, style: ShadTheme.of(context).textTheme.p),
+          ),
+          lesson.isCompleted
+              ? ShadBadge(
+                  backgroundColor: AppColors.success.withValues(alpha: 0.12),
+                  foregroundColor: AppColors.success,
+                  child: const Text('Completed'),
+                )
+              : Text(
+                  'Not yet',
+                  style: ShadTheme.of(
+                    context,
+                  ).textTheme.small.copyWith(color: scheme.mutedForeground),
                 ),
-              ),
-            )
-          : Text(
-              'Not yet',
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: AppColors.inkMuted),
-            ),
+        ],
+      ),
     );
   }
 }
@@ -203,67 +190,61 @@ class _QuizAttemptCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: accent.withValues(alpha: 0.05),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              attempt.quizId,
-              style: Theme.of(
-                context,
-              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              'Best: ${attempt.bestScore}% · Latest: ${attempt.latestScore}%',
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: AppColors.inkMuted),
-            ),
-            const SizedBox(height: 6),
-            // Running totals (client request): the per-question chips below
-            // show *which* items were right, but a student/teacher scanning
-            // the card had to count the chips by hand to answer "how many
-            // did I get right?" — this states it outright.
-            Builder(
-              builder: (context) {
-                final correctCount = attempt.perQuestionCorrect
-                    .where((isCorrect) => isCorrect)
-                    .length;
-                final incorrectCount =
-                    attempt.perQuestionCorrect.length - correctCount;
-                return Text(
-                  '$correctCount correct · $incorrectCount incorrect '
-                  '(out of ${attempt.perQuestionCorrect.length})',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700),
-                );
-              },
-            ),
-            const SizedBox(height: 10),
-            // Accessible per-question indicator: icon + text label together
-            // (Part 10.3) — never color-only, never tooltip/hover-only.
-            // Kept exactly that shape here, just colored to match its
-            // meaning instead of the flat default chip. Each chip is now
-            // numbered too, so "item 3 was wrong" is readable straight off
-            // the card instead of counting chip positions.
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: [
-                for (var i = 0; i < attempt.perQuestionCorrect.length; i++)
-                  _QuestionChip(
-                    questionNumber: i + 1,
-                    correct: attempt.perQuestionCorrect[i],
-                  ),
-              ],
-            ),
-          ],
-        ),
+    final scheme = ShadTheme.of(context).colorScheme;
+    return ShadCard(
+      backgroundColor: accent.withValues(alpha: 0.05),
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(attempt.quizId, style: ShadTheme.of(context).textTheme.h4),
+          const SizedBox(height: 2),
+          Text(
+            'Best: ${attempt.bestScore}% · Latest: ${attempt.latestScore}%',
+            style: ShadTheme.of(
+              context,
+            ).textTheme.small.copyWith(color: scheme.mutedForeground),
+          ),
+          const SizedBox(height: 6),
+          // Running totals (client request): the per-question chips below
+          // show *which* items were right, but a student/teacher scanning
+          // the card had to count the chips by hand to answer "how many
+          // did I get right?" — this states it outright.
+          Builder(
+            builder: (context) {
+              final correctCount = attempt.perQuestionCorrect
+                  .where((isCorrect) => isCorrect)
+                  .length;
+              final incorrectCount =
+                  attempt.perQuestionCorrect.length - correctCount;
+              return Text(
+                '$correctCount correct · $incorrectCount incorrect '
+                '(out of ${attempt.perQuestionCorrect.length})',
+                style: ShadTheme.of(
+                  context,
+                ).textTheme.small.copyWith(fontWeight: FontWeight.w700),
+              );
+            },
+          ),
+          const SizedBox(height: 10),
+          // Accessible per-question indicator: icon + text label together
+          // (Part 10.3) — never color-only, never tooltip/hover-only.
+          // Kept exactly that shape here, just colored to match its
+          // meaning instead of the flat default chip. Each chip is now
+          // numbered too, so "item 3 was wrong" is readable straight off
+          // the card instead of counting chip positions.
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              for (var i = 0; i < attempt.perQuestionCorrect.length; i++)
+                _QuestionChip(
+                  questionNumber: i + 1,
+                  correct: attempt.perQuestionCorrect[i],
+                ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -279,17 +260,15 @@ class _QuestionChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = correct ? AppColors.success : AppColors.destructive;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(999),
-      ),
+    final scheme = ShadTheme.of(context).colorScheme;
+    final color = correct ? AppColors.success : scheme.destructive;
+    return ShadBadge(
+      backgroundColor: color.withValues(alpha: 0.12),
+      foregroundColor: color,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(correct ? Icons.check : Icons.close, size: 14, color: color),
+          Icon(correct ? LucideIcons.check : LucideIcons.x, size: 14, color: color),
           const SizedBox(width: 4),
           Text(
             '$questionNumber. ${correct ? 'Correct' : 'Incorrect'}',

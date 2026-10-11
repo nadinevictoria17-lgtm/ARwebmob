@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../auth/student_auth_providers.dart';
 
@@ -35,7 +36,7 @@ class StudentShell extends ConsumerWidget {
         actions: [
           IconButton(
             tooltip: 'Sign out',
-            icon: const Icon(Icons.logout),
+            icon: const Icon(LucideIcons.logOut),
             onPressed: () => _confirmSignOut(context, ref),
           ),
         ],
@@ -45,13 +46,13 @@ class StudentShell extends ConsumerWidget {
         selectedIndex: currentIndex,
         onDestinationSelected: onDestinationSelected,
         destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Home'),
+          NavigationDestination(icon: Icon(LucideIcons.house), label: 'Home'),
           NavigationDestination(
-            icon: Icon(Icons.menu_book_outlined),
+            icon: Icon(LucideIcons.bookOpen),
             label: 'Learn',
           ),
           NavigationDestination(
-            icon: Icon(Icons.bar_chart_outlined),
+            icon: Icon(LucideIcons.chartColumn),
             label: 'Progress',
           ),
         ],
@@ -61,17 +62,17 @@ class StudentShell extends ConsumerWidget {
 }
 
 Future<void> _confirmSignOut(BuildContext context, WidgetRef ref) async {
-  final confirmed = await showDialog<bool>(
+  final confirmed = await showShadDialog<bool>(
     context: context,
-    builder: (context) => AlertDialog(
+    builder: (context) => ShadDialog.alert(
       title: const Text('Sign out?'),
-      content: const Text("You'll need to sign in again to continue."),
+      description: const Text("You'll need to sign in again to continue."),
       actions: [
-        TextButton(
+        ShadButton.outline(
           onPressed: () => Navigator.pop(context, false),
           child: const Text('Cancel'),
         ),
-        FilledButton(
+        ShadButton.destructive(
           onPressed: () => Navigator.pop(context, true),
           child: const Text('Sign out'),
         ),

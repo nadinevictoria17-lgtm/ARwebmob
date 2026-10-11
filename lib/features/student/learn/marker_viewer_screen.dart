@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show NetworkAssetBundle, rootBundle;
 import 'package:photo_view/photo_view.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../core/ar/marker_mapping.dart';
 
@@ -36,10 +37,12 @@ class MarkerViewerScreen extends StatelessWidget {
         foregroundColor: Colors.white,
         title: Text(lessonTitle),
         actions: [
-          IconButton(
-            tooltip: 'Save or share this marker',
-            icon: const Icon(Icons.download_outlined),
-            onPressed: () => _share(context),
+          Tooltip(
+            message: 'Save or share this marker',
+            child: ShadIconButton.ghost(
+              icon: const Icon(LucideIcons.download, color: Colors.white),
+              onPressed: () => _share(context),
+            ),
           ),
         ],
       ),

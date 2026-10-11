@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:permission_handler_platform_interface/permission_handler_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:ar_science_explorer/core/services/access_code_service.dart';
 import 'package:ar_science_explorer/core/services/quiz_attempt_service.dart';
 import 'package:ar_science_explorer/core/services/voice_over_controller.dart';
@@ -87,7 +88,8 @@ ArLabViewModel _buildViewModel({
   );
 }
 
-Widget _wrap(Widget child) => MaterialApp(home: Scaffold(body: child));
+// ShadApp, not MaterialApp: ScanTab's overlays read ShadTheme.of(context).
+Widget _wrap(Widget child) => ShadApp(home: Scaffold(body: child));
 
 const _embedUnityChannel = MethodChannel(
   'com.learntoflutter/flutter_embed_unity',

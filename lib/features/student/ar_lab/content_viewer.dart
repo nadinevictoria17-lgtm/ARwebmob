@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view_gallery.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:url_launcher/url_launcher.dart' as url_launcher;
 
 /// Renders a teacher-authored lesson's uploaded content: nothing when no
@@ -50,19 +51,26 @@ class _ContentViewerState extends State<ContentViewer> {
     final urls = widget.imageUrls;
     if (urls == null || urls.isEmpty) return const SizedBox.shrink();
 
+    final scheme = ShadTheme.of(context).colorScheme;
+
     if (widget.status == 'processing') {
-      return const Padding(
-        padding: EdgeInsets.all(16),
+      return Padding(
+        padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            SizedBox(
+            const SizedBox(
               width: 20,
               height: 20,
               child: CircularProgressIndicator(strokeWidth: 2),
             ),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
             Expanded(
-              child: Text("Processing your teacher's uploaded content..."),
+              child: Text(
+                "Processing your teacher's uploaded content...",
+                style: ShadTheme.of(
+                  context,
+                ).textTheme.muted.copyWith(color: scheme.mutedForeground),
+              ),
             ),
           ],
         ),
@@ -75,12 +83,18 @@ class _ContentViewerState extends State<ContentViewer> {
     if (urls.length == 1 && _isPdfUrl(urls.first)) {
       return Padding(
         padding: const EdgeInsets.all(16),
-        child: OutlinedButton.icon(
+        child: ShadButton.outline(
           key: const Key('content-viewer-open-pdf'),
           onPressed: () =>
               (widget.launchUrl ?? _defaultLaunchUrl)(Uri.parse(urls.first)),
-          icon: const Icon(Icons.picture_as_pdf_outlined),
-          label: const Text('View lesson content (PDF)'),
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(LucideIcons.fileText, size: 16),
+              SizedBox(width: 8),
+              Text('View lesson content (PDF)'),
+            ],
+          ),
         ),
       );
     }
@@ -90,24 +104,37 @@ class _ContentViewerState extends State<ContentViewer> {
       child: Column(
         children: [
           Expanded(
-            child: PhotoViewGallery.builder(
-              pageController: _controller,
-              itemCount: urls.length,
-              onPageChanged: (index) => setState(() => _currentIndex = index),
-              builder: (context, index) => PhotoViewGalleryPageOptions(
-                imageProvider: NetworkImage(urls[index]),
-                // A slide image can fail to load (network hiccup, an
-                // expired signed URL) — fall back to a plain icon instead
-                // of letting the uncaught NetworkImageLoadException bubble
-                // up through the image resource service.
-                errorBuilder: (context, error, stackTrace) => const Center(
-                  child: Icon(Icons.broken_image_outlined, size: 48),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: PhotoViewGallery.builder(
+                pageController: _controller,
+                itemCount: urls.length,
+                onPageChanged: (index) =>
+                    setState(() => _currentIndex = index),
+                builder: (context, index) => PhotoViewGalleryPageOptions(
+                  imageProvider: NetworkImage(urls[index]),
+                  // A slide image can fail to load (network hiccup, an
+                  // expired signed URL) — fall back to a plain icon instead
+                  // of letting the uncaught NetworkImageLoadException bubble
+                  // up through the image resource service.
+                  errorBuilder: (context, error, stackTrace) => Center(
+                    child: Icon(
+                      LucideIcons.imageOff,
+                      size: 48,
+                      color: scheme.mutedForeground,
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
           const SizedBox(height: 8),
-          Text('${_currentIndex + 1} / ${urls.length}'),
+          Text(
+            '${_currentIndex + 1} / ${urls.length}',
+            style: ShadTheme.of(
+              context,
+            ).textTheme.small.copyWith(color: scheme.mutedForeground),
+          ),
         ],
       ),
     );

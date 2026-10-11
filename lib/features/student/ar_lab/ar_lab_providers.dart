@@ -109,12 +109,10 @@ class ArLabViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void onMarkerLost(String trackableName) {
-    final lostLesson = lessonForTrackableName(kBuiltInLessons, trackableName);
-    if (lostLesson?.id != detectedLesson?.id) return;
-    detectedLesson = null;
-    notifyListeners();
-  }
+  /// Called when Unity loses tracking of a marker. Unity keeps the model
+  /// pinned to the screen center after a scan, so the lesson stays detected
+  /// (and its description card visible) until a different marker is scanned.
+  void onMarkerLost(String trackableName) {}
 }
 
 final arLabViewModelProvider = StreamProvider.autoDispose

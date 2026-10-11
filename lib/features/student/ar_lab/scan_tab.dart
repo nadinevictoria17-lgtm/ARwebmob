@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_embed_unity/flutter_embed_unity.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../core/ar/marker_mapping.dart';
 import '../../../core/ar/voice_scripts_data.dart';
@@ -155,7 +156,21 @@ class _ScanTabState extends State<ScanTab> with WidgetsBindingObserver {
 
   void _onViewModelChanged() => setState(() {});
 
+  // The parent's StreamProvider emits a new ArLabViewModel instance whenever
+  // the student record updates. Without re-subscribing here, this tab keeps
+  // listening to the stale instance, so a marker found on the new one (e.g.
+  // the lesson description card) never triggers a rebuild.
+  @override
+  void didUpdateWidget(ScanTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.vm != widget.vm) {
+      oldWidget.vm.removeListener(_onViewModelChanged);
+      widget.vm.addListener(_onViewModelChanged);
+    }
+  }
+
   void _handleUnityMessage(String message) {
+    debugPrint('ScanTab: Unity message received: $message');
     try {
       final decoded = jsonDecode(message);
       if (decoded is! Map<String, dynamic>) return;
@@ -164,6 +179,10 @@ class _ScanTabState extends State<ScanTab> with WidgetsBindingObserver {
       if (trackableName == null) return;
       if (event == 'markerFound') {
         widget.vm.onMarkerFound(trackableName);
+        debugPrint(
+          'ScanTab: markerFound "$trackableName" -> lesson '
+          '${widget.vm.detectedLesson?.id ?? "NO MATCH"}',
+        );
       } else if (event == 'markerLost') {
         widget.vm.onMarkerLost(trackableName);
       } else if (event == 'wrongModel') {
@@ -190,13 +209,16 @@ class _ScanTabState extends State<ScanTab> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     if (!widget.vm.hasAR) {
+      final scheme = ShadTheme.of(context).colorScheme;
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Text(
             "This lesson doesn't have an AR model — continue to the Read tab.",
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.titleMedium,
+            style: ShadTheme.of(
+              context,
+            ).textTheme.p.copyWith(color: scheme.mutedForeground),
           ),
         ),
       );
@@ -207,23 +229,24 @@ class _ScanTabState extends State<ScanTab> with WidgetsBindingObserver {
     }
 
     if (!_cameraPermission!.isGranted) {
+      final scheme = ShadTheme.of(context).colorScheme;
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.videocam_off, size: 48),
+              Icon(LucideIcons.videoOff, size: 48, color: scheme.mutedForeground),
               const SizedBox(height: 12),
               Text(
                 _cameraPermission!.isPermanentlyDenied
                     ? 'Camera access is off for this app. Enable it in your phone\'s Settings to use Scan.'
                     : 'Camera access is needed to scan AR markers.',
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.titleMedium,
+                style: ShadTheme.of(context).textTheme.p,
               ),
               const SizedBox(height: 16),
-              FilledButton(
+              ShadButton(
                 onPressed: _cameraPermission!.isPermanentlyDenied
                     ? openAppSettings
                     : _requestCameraPermission,
@@ -301,52 +324,50 @@ class _InstructionOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: Colors.black.withValues(alpha: 0.6),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (markerImage != null) ...[
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child:
-                    // A teacher-uploaded marker is a real Firebase Storage
-                    // URL; the built-in curriculum's marker is a bundled
-                    // asset (`/markers/QxWy.jpg`) -- `Image.network` can
-                    // never resolve the latter (no scheme/host), so it must
-                    // go through `Image.asset` instead.
-                    isNetworkMarker(markerImage!)
-                    ? Image.network(
-                        markerImage!,
-                        height: 96,
-                        fit: BoxFit.contain,
-                        // A broken/unreachable marker-image URL should
-                        // never block the actual instruction text below it
-                        // -- just drop the thumbnail silently.
-                        errorBuilder: (context, error, stackTrace) =>
-                            const SizedBox.shrink(),
-                      )
-                    : Image.asset(
-                        markerAssetPath(markerImage!),
-                        height: 96,
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const SizedBox.shrink(),
-                      ),
-              ),
-              const SizedBox(height: 12),
-            ],
-            Text(
-              text,
-              textAlign: TextAlign.center,
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(color: Colors.white),
+    return ShadCard(
+      backgroundColor: Colors.black.withValues(alpha: 0.6),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (markerImage != null) ...[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child:
+                  // A teacher-uploaded marker is a real Firebase Storage
+                  // URL; the built-in curriculum's marker is a bundled
+                  // asset (`/markers/QxWy.jpg`) -- `Image.network` can
+                  // never resolve the latter (no scheme/host), so it must
+                  // go through `Image.asset` instead.
+                  isNetworkMarker(markerImage!)
+                  ? Image.network(
+                      markerImage!,
+                      height: 96,
+                      fit: BoxFit.contain,
+                      // A broken/unreachable marker-image URL should
+                      // never block the actual instruction text below it
+                      // -- just drop the thumbnail silently.
+                      errorBuilder: (context, error, stackTrace) =>
+                          const SizedBox.shrink(),
+                    )
+                  : Image.asset(
+                      markerAssetPath(markerImage!),
+                      height: 96,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) =>
+                          const SizedBox.shrink(),
+                    ),
             ),
+            const SizedBox(height: 12),
           ],
-        ),
+          Text(
+            text,
+            textAlign: TextAlign.center,
+            style: ShadTheme.of(
+              context,
+            ).textTheme.h4.copyWith(color: Colors.white),
+          ),
+        ],
       ),
     );
   }
@@ -363,25 +384,23 @@ class _WrongModelOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: Colors.red.withValues(alpha: 0.85),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.error_outline, color: Colors.white),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                text,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(color: Colors.white),
-              ),
+    return ShadCard(
+      backgroundColor: Colors.red.withValues(alpha: 0.85),
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(LucideIcons.circleAlert, color: Colors.white),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: ShadTheme.of(
+                context,
+              ).textTheme.h4.copyWith(color: Colors.white),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -420,7 +439,8 @@ class _DetectedLessonOverlayState extends State<_DetectedLessonOverlay> {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    final textTheme = ShadTheme.of(context).textTheme;
+    final scheme = ShadTheme.of(context).colorScheme;
     final payload = widget.lesson.arPayload;
     final keyIdeas = payload?.keyIdeas;
 
@@ -434,27 +454,30 @@ class _DetectedLessonOverlayState extends State<_DetectedLessonOverlay> {
             Expanded(
               child: Text(
                 payload?.title ?? widget.lesson.title,
-                style: textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: textTheme.p.copyWith(fontWeight: FontWeight.bold),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            Icon(_expanded ? Icons.expand_more : Icons.expand_less, size: 20),
+            Icon(
+              _expanded ? LucideIcons.chevronDown : LucideIcons.chevronUp,
+              size: 20,
+              color: scheme.mutedForeground,
+            ),
           ],
         ),
       ),
     );
 
     if (!_expanded) {
-      return Card(child: header);
+      return ShadCard(padding: EdgeInsets.zero, child: header);
     }
 
     // Capped and scrollable rather than sized to content: a lesson with a
     // long description plus several key ideas would otherwise grow tall
     // enough to cover most of the live Unity camera feed above it.
-    return Card(
+    return ShadCard(
+      padding: EdgeInsets.zero,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -471,13 +494,20 @@ class _DetectedLessonOverlayState extends State<_DetectedLessonOverlay> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (payload?.subtitle != null)
-                      Text(payload!.subtitle!, style: textTheme.bodySmall),
+                      Text(
+                        payload!.subtitle!,
+                        style: textTheme.small.copyWith(
+                          color: scheme.mutedForeground,
+                        ),
+                      ),
                     if (payload?.description != null)
                       Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
                           payload!.description!,
-                          style: textTheme.bodySmall,
+                          style: textTheme.small.copyWith(
+                            color: scheme.mutedForeground,
+                          ),
                         ),
                       ),
                     if (keyIdeas != null)
@@ -487,7 +517,12 @@ class _DetectedLessonOverlayState extends State<_DetectedLessonOverlay> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             for (final idea in keyIdeas)
-                              Text('• $idea', style: textTheme.bodySmall),
+                              Text(
+                                '• $idea',
+                                style: textTheme.small.copyWith(
+                                  color: scheme.mutedForeground,
+                                ),
+                              ),
                           ],
                         ),
                       ),
@@ -517,25 +552,29 @@ class _VoiceControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            DropdownButton<String>(
-              value: language,
-              items: const [
-                DropdownMenuItem(value: 'en', child: Text('English')),
-                DropdownMenuItem(value: 'Filipino', child: Text('Filipino')),
-              ],
-              onChanged: (value) {
-                if (value != null) onLanguageChanged(value);
-              },
-            ),
-            IconButton(icon: const Icon(Icons.volume_up), onPressed: onPlay),
-          ],
-        ),
+    return ShadCard(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ShadSelect<String>(
+            initialValue: language,
+            minWidth: 110,
+            options: const [
+              ShadOption(value: 'en', child: Text('English')),
+              ShadOption(value: 'Filipino', child: Text('Filipino')),
+            ],
+            selectedOptionBuilder: (context, value) =>
+                Text(value == 'en' ? 'English' : 'Filipino'),
+            onChanged: (value) {
+              if (value != null) onLanguageChanged(value);
+            },
+          ),
+          ShadIconButton.ghost(
+            icon: const Icon(LucideIcons.volume2),
+            onPressed: onPlay,
+          ),
+        ],
       ),
     );
   }

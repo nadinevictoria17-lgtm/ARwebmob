@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import 'ar_lab_providers.dart';
 import 'content_viewer.dart';
@@ -23,13 +24,14 @@ class ReadTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pdfAsset = _bundledPdfAsset;
+    final scheme = ShadTheme.of(context).colorScheme;
 
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Text(vm.title, style: Theme.of(context).textTheme.headlineSmall),
+        Text(vm.title, style: ShadTheme.of(context).textTheme.h3),
         const SizedBox(height: 12),
-        Text(vm.summary, style: Theme.of(context).textTheme.bodyLarge),
+        Text(vm.summary, style: ShadTheme.of(context).textTheme.p),
         ContentViewer(imageUrls: vm.contentImageUrls, status: vm.contentStatus),
         // The lesson module itself, read in place. Every built-in lesson
         // ships a PDF under assets/lessons/ (Q1W1..Q3W8) — these were in
@@ -52,12 +54,30 @@ class ReadTab extends StatelessWidget {
         ],
         const SizedBox(height: 24),
         if (!vm.isRead)
-          FilledButton(
+          ShadButton(
             onPressed: () async => vm.onMarkAsRead(),
-            child: const Text('Mark as Read'),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(LucideIcons.check, size: 16),
+                SizedBox(width: 8),
+                Text('Mark as Read'),
+              ],
+            ),
           )
         else
-          const Chip(label: Text('Read'), avatar: Icon(Icons.check)),
+          ShadBadge(
+            backgroundColor: scheme.primary.withValues(alpha: 0.12),
+            foregroundColor: scheme.primary,
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(LucideIcons.check, size: 14),
+                SizedBox(width: 4),
+                Text('Read'),
+              ],
+            ),
+          ),
       ],
     );
   }

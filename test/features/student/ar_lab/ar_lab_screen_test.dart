@@ -4,6 +4,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:permission_handler_platform_interface/permission_handler_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:ar_science_explorer/core/services/voice_over_controller.dart';
 import 'package:ar_science_explorer/features/student/ar_lab/ar_lab_providers.dart';
 import 'package:ar_science_explorer/features/student/ar_lab/ar_lab_screen.dart';
@@ -87,7 +88,7 @@ void main() {
             'q1w1',
           ).overrideWith((ref) => Stream.value(vm)),
         ],
-        child: const MaterialApp(home: ArLabScreen(lessonId: 'q1w1')),
+        child: const ShadApp(home: ArLabScreen(lessonId: 'q1w1')),
       ),
     );
     await tester.pumpAndSettle();
@@ -133,7 +134,7 @@ void main() {
             'q1w1',
           ).overrideWith((ref) => Stream.value(vm)),
         ],
-        child: MaterialApp(
+        child: ShadApp(
           home: ArLabScreen(
             lessonId: 'q1w1',
             voiceOverController: voiceOverController,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 import '../../../core/models/subject_key.dart';
 import '../../../core/theme/app_theme.dart';
@@ -34,7 +35,7 @@ class _EmptySubject extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                Icons.science_outlined,
+                LucideIcons.flaskConical,
                 size: 28,
                 color: subject.accentColor,
               ),
@@ -42,15 +43,13 @@ class _EmptySubject extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               'No ${subject.name} lessons yet',
-              style: Theme.of(context).textTheme.titleMedium,
+              style: ShadTheme.of(context).textTheme.h4,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 4),
             Text(
               'Check back once your teacher adds some.',
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: AppColors.inkMuted),
+              style: ShadTheme.of(context).textTheme.muted,
               textAlign: TextAlign.center,
             ),
           ],
@@ -85,7 +84,7 @@ class LearnScreen extends ConsumerWidget {
               onTap: (i) => vm.onSelectSubject(_subjectOrder[i]),
               indicatorColor: vm.activeSubject.accentColor,
               labelColor: vm.activeSubject.accentColor,
-              unselectedLabelColor: AppColors.inkMuted,
+              unselectedLabelColor: ShadTheme.of(context).colorScheme.mutedForeground,
               isScrollable: true,
               tabAlignment: TabAlignment.start,
               tabs: const [
@@ -101,11 +100,26 @@ class LearnScreen extends ConsumerWidget {
                   : ListView(
                       padding: const EdgeInsets.all(16),
                       children: [
-                        for (final card in vm.cards)
-                          LessonCard(
-                            data: card,
-                            studentId: vm.studentId,
-                            accessCodeService: vm.accessCodeService,
+                        for (var i = 0; i < vm.cards.length; i++)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child:
+                                LessonCard(
+                                      data: vm.cards[i],
+                                      studentId: vm.studentId,
+                                      accessCodeService: vm.accessCodeService,
+                                    )
+                                    .animate()
+                                    .fadeIn(
+                                      duration: 220.ms,
+                                      delay: (i * 30).ms,
+                                    )
+                                    .slideY(
+                                      begin: 0.04,
+                                      end: 0,
+                                      duration: 220.ms,
+                                      delay: (i * 30).ms,
+                                    ),
                           ),
                       ],
                     ),

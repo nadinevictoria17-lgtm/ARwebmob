@@ -162,7 +162,19 @@ class _ArScienceExplorerAppState extends State<ArScienceExplorerApp> {
       builder: (context, ref, _) {
         final studentId = ref.watch(currentStudentIdProvider).valueOrNull;
         if (studentId == null) {
-          return const StudentLoginScreen();
+          // Same reasoning as the Teacher Web sign-in gate above: the
+          // student router isn't built until a student is signed in, so the
+          // sign-in gate gets its own `ShadApp` instance here. Both this and
+          // the signed-in branch below share the exact same
+          // `appShadTheme`/`studentTheme` pair, so there is one themed shell
+          // definition, not two independent ones (StudentLoginScreen no
+          // longer builds its own `MaterialApp`).
+          return ShadApp(
+            title: 'AR Science Explorer',
+            theme: appShadTheme,
+            materialThemeBuilder: (context, theme) => studentTheme,
+            home: const StudentLoginScreen(),
+          );
         }
 
         final services = _studentServicesFor(studentId);
@@ -170,10 +182,10 @@ class _ArScienceExplorerAppState extends State<ArScienceExplorerApp> {
         return ProviderScope(
           key: ValueKey(studentId),
           overrides: studentProviderOverridesFor(studentId, services: services),
-          child: MaterialApp.router(
+          child: ShadApp.router(
             title: 'AR Science Explorer',
-            debugShowCheckedModeBanner: false,
-            theme: studentTheme,
+            theme: appShadTheme,
+            materialThemeBuilder: (context, theme) => studentTheme,
             routerConfig: _studentRouter!,
           ),
         );

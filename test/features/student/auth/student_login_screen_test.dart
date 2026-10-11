@@ -1,11 +1,12 @@
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:ar_science_explorer/core/services/auth_service.dart';
 import 'package:ar_science_explorer/core/services/student_repository.dart';
+import 'package:ar_science_explorer/core/theme/app_theme.dart';
 import 'package:ar_science_explorer/features/student/auth/student_auth_providers.dart';
 import 'package:ar_science_explorer/features/student/auth/student_login_screen.dart';
 
@@ -41,7 +42,7 @@ Future<void> _pumpScreen(WidgetTester tester, AuthService authService) {
           StudentRepository(firestore: FakeFirebaseFirestore()),
         ),
       ],
-      child: const StudentLoginScreen(),
+      child: ShadApp(theme: appShadTheme, home: const StudentLoginScreen()),
     ),
   );
 }
@@ -51,7 +52,7 @@ void main() {
     testWidgets('formats a typed digit id live as 00-0000', (tester) async {
       await _pumpScreen(tester, _TrackingAuthService());
 
-      await tester.enterText(find.byType(TextField).first, '123456');
+      await tester.enterText(find.byType(ShadInput).first, '123456');
       await tester.pump();
 
       expect(find.text('12-3456'), findsOneWidget);
@@ -61,7 +62,7 @@ void main() {
       await _pumpScreen(tester, _TrackingAuthService());
 
       await tester.enterText(
-        find.byType(TextField).first,
+        find.byType(ShadInput).first,
         'student@arscience.school',
       );
       await tester.pump();
@@ -75,11 +76,11 @@ void main() {
         final authService = _TrackingAuthService();
         await _pumpScreen(tester, authService);
 
-        await tester.enterText(find.byType(TextField).first, '123456');
-        await tester.enterText(find.byType(TextField).last, 'secret');
+        await tester.enterText(find.byType(ShadInput).first, '123456');
+        await tester.enterText(find.byType(ShadInput).last, 'secret');
         await tester.pump();
 
-        await tester.tap(find.widgetWithText(FilledButton, 'Sign in'));
+        await tester.tap(find.widgetWithText(ShadButton, 'Sign in'));
         await tester.pumpAndSettle();
 
         expect(authService.signInStudentCallCount, 1);

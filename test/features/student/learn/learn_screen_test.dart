@@ -1,11 +1,13 @@
 // test/features/student/learn/learn_screen_test.dart
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:ar_science_explorer/core/models/subject_key.dart';
 import 'package:ar_science_explorer/core/services/access_code_service.dart';
 import 'package:ar_science_explorer/core/services/quiz_attempt_service.dart';
+import 'package:ar_science_explorer/core/theme/app_theme.dart';
 import 'package:ar_science_explorer/features/student/learn/learn_providers.dart';
 import 'package:ar_science_explorer/features/student/learn/learn_screen.dart';
 
@@ -55,7 +57,7 @@ void main() {
               (ref) => Stream.value(viewModel),
             ),
           ],
-          child: const MaterialApp(home: LearnScreen()),
+          child: ShadApp(theme: appShadTheme, home: const LearnScreen()),
         ),
       );
       await tester.pumpAndSettle();
@@ -96,7 +98,7 @@ void main() {
         overrides: [
           learnViewModelProvider.overrideWith((ref) => Stream.value(viewModel)),
         ],
-        child: const MaterialApp(home: LearnScreen()),
+        child: ShadApp(theme: appShadTheme, home: const LearnScreen()),
       ),
     );
     await tester.pumpAndSettle();
@@ -126,7 +128,7 @@ void main() {
               (ref) => Stream.value(viewModel),
             ),
           ],
-          child: const MaterialApp(home: LearnScreen()),
+          child: ShadApp(theme: appShadTheme, home: const LearnScreen()),
         ),
       );
       await tester.pumpAndSettle();

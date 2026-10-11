@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:photo_view/photo_view_gallery.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:ar_science_explorer/features/student/ar_lab/content_viewer.dart';
 
 void main() {
@@ -8,7 +9,8 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      const MaterialApp(
+      // ShadApp, not MaterialApp: the widget reads ShadTheme.of(context).
+      const ShadApp(
         home: Scaffold(body: ContentViewer(imageUrls: null, status: null)),
       ),
     );
@@ -20,7 +22,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      const MaterialApp(
+      const ShadApp(
         home: Scaffold(
           body: ContentViewer(
             imageUrls: ['https://example.com/a.pptx'],
@@ -34,7 +36,7 @@ void main() {
 
   testWidgets('shows a swipeable gallery once ready', (tester) async {
     await tester.pumpWidget(
-      const MaterialApp(
+      const ShadApp(
         home: Scaffold(
           body: ContentViewer(
             imageUrls: [
@@ -63,7 +65,7 @@ void main() {
       Uri? launchedUri;
 
       await tester.pumpWidget(
-        MaterialApp(
+        ShadApp(
           home: Scaffold(
             body: ContentViewer(
               imageUrls: const ['https://example.com/lesson-notes.pdf'],

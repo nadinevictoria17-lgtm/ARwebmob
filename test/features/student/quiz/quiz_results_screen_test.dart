@@ -2,6 +2,7 @@ import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:ar_science_explorer/core/services/access_code_service.dart';
 import 'package:ar_science_explorer/core/services/quiz_attempt_service.dart';
 import 'package:ar_science_explorer/features/student/access_code/access_code_sheet.dart';
@@ -22,7 +23,8 @@ Widget _wrap(Widget child) {
       ),
     ],
   );
-  return MaterialApp.router(routerConfig: router);
+  // ShadApp, not MaterialApp: QuizResultsScreen reads ShadTheme.of(context).
+  return ShadApp.router(routerConfig: router);
 }
 
 void main() {
