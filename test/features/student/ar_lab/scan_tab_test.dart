@@ -116,22 +116,8 @@ void main() {
   });
 
   testWidgets(
-    'shows "Point your camera" instruction when hasAR is true and nothing detected',
-    (tester) async {
-      final vm = _buildViewModel(lessonId: 'q1w1', hasAR: true);
-      final voiceOverController = VoiceOverController(tts: FakeFlutterTts());
-
-      await tester.pumpWidget(
-        _wrap(ScanTab(vm: vm, voiceOverController: voiceOverController)),
-      );
-      await tester.pump();
-
-      expect(find.textContaining('Point your camera'), findsOneWidget);
-    },
-  );
-
-  testWidgets(
-    'shows the lesson\'s marker image in the instruction overlay when one is set',
+    'shows no instruction card or marker image over the camera while nothing '
+    'is detected',
     (tester) async {
       final vm = _buildViewModel(
         lessonId: 'q1w1',
@@ -145,33 +131,13 @@ void main() {
       );
       await tester.pump();
 
-      final image = tester.widget<Image>(find.byType(Image));
-      expect(
-        (image.image as NetworkImage).url,
-        'https://fake-storage.example/lessons/q1w1/marker.png',
-      );
-    },
-  );
-
-  testWidgets(
-    'shows no marker image in the instruction overlay when the lesson has none',
-    (tester) async {
-      final vm = _buildViewModel(lessonId: 'q1w1', hasAR: true);
-      final voiceOverController = VoiceOverController(tts: FakeFlutterTts());
-
-      await tester.pumpWidget(
-        _wrap(ScanTab(vm: vm, voiceOverController: voiceOverController)),
-      );
-      await tester.pump();
-
+      expect(find.textContaining('Point your camera'), findsNothing);
       expect(find.byType(Image), findsNothing);
-      expect(find.textContaining('Point your camera'), findsOneWidget);
     },
   );
 
   testWidgets(
-    'shows the detected lesson\'s AR title and hides the "Point your camera" '
-    'instruction once a marker is found',
+    'shows the detected lesson\'s AR title once a marker is found',
     (tester) async {
       final vm = _buildViewModel(lessonId: 'q1w1', hasAR: true);
       final voiceOverController = VoiceOverController(tts: FakeFlutterTts());
@@ -347,7 +313,7 @@ void main() {
       await tester.pump();
 
       expect(vm.detectedLesson, isNull);
-      expect(find.textContaining('Point your camera'), findsOneWidget);
+      expect(find.textContaining('Point your camera'), findsNothing);
     },
   );
 
@@ -376,7 +342,7 @@ void main() {
       await tester.pump();
 
       expect(vm.detectedLesson, isNull);
-      expect(find.textContaining('Point your camera'), findsOneWidget);
+      expect(find.textContaining('Point your camera'), findsNothing);
     },
   );
 }
